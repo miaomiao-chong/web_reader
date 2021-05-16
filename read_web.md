@@ -1,3 +1,7 @@
+技巧
+
+# 2
+
 ## 2.2
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210514070011157.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
@@ -249,3 +253,166 @@ $fontSize : 37.5;
 }
 ```
 
+# 3
+
+## 3.1 epubjs的核心工作原理
+
+实例化一个book对象 book对象对电子书解析 
+		通过renderTo方法生成rendition对象 rendition对象负责电子书的渲染 通过renditon可以得到theme对象
+			theme负责电子书的样式和主题 比如设置字号 设置主题这些功能
+		location负责电子书的定位 用来实现拖动进度条时快速定位的功能
+		navigation也是由book对象生成的 用来展示目录并提供目录所在的路径
+
+## 3.2 电子书解析
+
+现在来实现电子书的解析和渲染
+
+src目录下创建个文件  vue组件 Ebook.vue
+技巧 ：然后可以新建一个模板代码
+https://www.jianshu.com/p/b0a96e61c811
+
+ 
+
+```json
+{
+  "Print to console": {
+    "prefix": "vue",  
+    "body": [
+      "<!-- $1 -->",
+      "<template>",
+      "<div></div>",
+      "</template>",
+      "",
+      "<script>",
+      "export default {",
+      "data() {",
+      "return {",
+      "",
+      "}",
+      "},",
+      "//生命周期 - 创建完成（访问当前this实例）",
+      "created() {",
+      "",
+      "},",
+      "//生命周期 - 挂载完成（访问DOM元素）",
+      "mounted() {",
+      "",
+      "}",
+      "}",
+      "</script>",
+      "<style lang='scss' scoped>",
+      "@import 'assets/style/global';",
+      "</style>"
+    ],
+    "description": "Log output to console"
+  }
+}
+```
+
+接下来到router文件夹下配置一下路由
+导入我们的Ebook组件
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516093929549.png)
+
+然后在routes下面再建一个对象
+
+path为/ebook   component为刚刚导入的Ebook组件    然后将根路径做一些调整 重定向到/ebook路径下
+
+这时候在ebook.vue里面随便写点东西
+
+可以发现能正确运行了
+
+接着在Epub.vue里导入epubjs
+把电子书放在static路径下  
+
+```js
+import Epub from 'epubjs'
+const DOWMLOAD_URL = '/static/aaa.epub'
+```
+
+之后建一个方法 showEpub 
+mounted钩子函数中调用showEpub
+
+showEpub中 
+	生成Ebook对象
+	生成Rendition对象
+	通过Rendition对象的display方法渲染电子书
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516101538276.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516101955395.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516102103109.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516102210585.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021051610310097.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+接着生成rendition对象  他是通过Book对象的renderTo方法生成的 
+方法需要两个参数一个是dom 生成的电子书会挂载到id上
+第二个是option   设置width height都为屏幕宽高
+
+我们挂载到read上![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516104943791.png)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516110426503.png)
+
+如何消除报错
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516110530487.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+技巧：想一劳永逸的话需要修改eslint的配置文件
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516110914792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+```vue
+<!--  -->
+<template>
+  <div class="ebook">
+    <div class="read_wrapper">
+      <div id="read"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Epub from 'epubjs'
+const DOWMLOAD_URL = '/static/duzhe.epub'
+export default {
+  data () {
+    return {}
+  },
+  methods: {
+    // 电子书的解析和渲染
+    showEpub () {
+      this.book = new Epub(DOWMLOAD_URL)
+      console.log(this.book.renderTo())
+      global.ePub = Epub
+      this.renditon = this.book.renderTo('read', {
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+      this.renditon.display()
+    }
+  },
+  // 生命周期 - 创建完成（访问当前this实例）
+  created () {},
+  // 生命周期 - 挂载完成（访问DOM元素）
+  mounted () {
+    this.showEpub()
+  }
+}
+</script>
+<style lang='scss' scoped>
+@import "assets/style/global";
+</style>
+
+```
+
+## 3.3 翻页功能
+
+做点击功能可以在div上层使用绝对定位做一个浮层
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516173746927.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516173523136.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210516174824775.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW96aGF6aGF6aGF6aGE=,size_16,color_FFFFFF,t_70)
